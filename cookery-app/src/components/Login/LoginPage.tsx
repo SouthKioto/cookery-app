@@ -21,8 +21,16 @@ export const LoginPage = () => {
         const token = GenerateUserTokent(res.data[0].id);
         //console.log(token);//console.log(res.data[0].id);
         //console.log(res.data);
-        localStorage.setItem('userToken', token);
-        navigate(`/userPage/${token}`);
+        const storageData = [
+          {
+            token: token,
+            //role: 'user',
+            isLoggedIn: true,
+          },
+        ];
+
+        localStorage.setItem('userToken', JSON.stringify(storageData));
+        navigate(`/users/userPage/${token}`);
       })
       .catch(error => console.log(error));
   };

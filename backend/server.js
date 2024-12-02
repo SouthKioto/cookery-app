@@ -14,6 +14,7 @@ const db = mysql.createConnection({
   database: 'cookery_app',
 });
 
+//get
 app.get('/users', (req, res) => {
   const sql = 'SELECT * FROM users';
 
@@ -26,6 +27,21 @@ app.get('/users', (req, res) => {
   });
 });
 
+app.get('/users/:id', (req, res) => {
+  const sql = 'SELECT * FROM users WHERE id = ?';
+
+  const id = req.params.id;
+
+  db.query(sql, [id], (error, result) => {
+    if (error) {
+      return res.json('Error: ' + error);
+    } else {
+      return res.json(result);
+    }
+  });
+});
+
+//post
 app.post('/loginUser', (req, res) => {
   const sql = 'SELECT * FROM users WHERE user_email = ? AND user_password = ?';
   const values = [req.body.email, req.body.password];
@@ -65,6 +81,29 @@ app.post('/createUser', (req, res) => {
         return res.json({ message: 'User created successfully', userId: results.insertId });
       }
     });
+  });
+});
+
+app.post('/createRecipe', (req, res) => {
+  const sqlCheck = 'Select * from recipe where title = ? and description = ? and ingredients = ?';
+  const sqlInsert = 'INSERT INTO recipe (title, description, ingredients, user_id) VALUES (?,?,?,?)';
+
+  const { recipeTitle, recipeDescription, ingredientsArray, Id } = req.body;
+
+  const ingredientsJSON = JSON.stringify(ingredientsArray);
+
+  db.query(sqlCheck, [recipeTitle, recipeDescription, ingredientsJSON], (err, results) => {
+    if (err) {
+      return res.json({ error: 'Error: ' + err });
+    } else {
+      db.query(sqlInsert, [recipeTitle, recipeDescription, ingredientsJSON, Id], (err, results) => {
+        if (err) {
+          return res.json({ error: 'Error: ' + err });
+        } else {
+          return res.json({ message: 'Recipe created successfully', recipeId: results.insertId });
+        }
+      });
+    }
   });
 });
 

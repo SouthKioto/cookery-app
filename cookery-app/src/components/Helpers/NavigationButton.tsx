@@ -5,13 +5,15 @@ interface NavigationButtonProps {
   path: string;
   variant: string;
   buttonValue: string;
+  onLogin: () => void;
 }
 
-export const NavigationButton: React.FC<NavigationButtonProps> = ({ path, variant, buttonValue }) => {
+export const NavigationButton: React.FC<NavigationButtonProps> = ({ path, variant, buttonValue, onLogin }) => {
   const navigate = useNavigate();
 
   const handleNavigateToPath = () => {
     navigate(path);
+    onLogin();
   };
 
   return (
