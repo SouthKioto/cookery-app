@@ -1,46 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { User } from '../Helpers/Interfaces';
-import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Accordion, Button } from 'react-bootstrap';
 import { GenerateDish } from './user_components/GenerateDish';
 import { AddUserRecipe } from './user_components/AddUserRecipe';
+import { UserRecipesList } from './user_components/UserRecipesList';
+import { GetUserIdFromToken } from '../Helpers/Utils';
 
 export const UserPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
   const [password, setPassword] = useState('');
+  const [userId, setUserId] = useState<number>();
 
   useEffect(() => {
-    const tokenString = localStorage.getItem('userToken');
+    const fetchUserId = async () => {
+      const id = await GetUserIdFromToken();
+      setUserId(id);
+    };
 
-    let id = '';
-    if (tokenString) {
-      try {
-        const token = JSON.parse(tokenString);
-        //console.log(token);
-
-        if (Array.isArray(token) && token[0]?.token !== undefined) {
-          //console.log(token[0]?.token);
-          const tokenData = token[0]?.token;
-          id = tokenData.slice(5, 6);
-        } else {
-          console.error('Nieprawidłowy format tokena.');
-        }
-      } catch (err) {
-        console.error('Błąd parsowania tokena:', err);
-      }
-    }
-
-    axios
-      .get<User[]>('http://localhost:8081/users/' + id)
-      .then(res => setUsers(res.data))
-      .catch(error => console.log(error));
+    fetchUserId();
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      axios
+        .get<User[]>(`http://localhost:8081/users/${userId}`)
+        .then(res => setUsers(res.data))
+        .catch(error => console.error(error));
+    }
+  }, [userId]);
 
   const handlePasswordVisibility = () => {
     setPasswordVisibility(!passwordVisibility);
+    console.log(userId);
   };
+
   return (
     <>
       {/* 
@@ -118,10 +113,18 @@ export const UserPage = () => {
               <Accordion.Item eventKey='1'>
                 <Accordion.Header className='text-lg font-semibold'>Dodaj własny przepis</Accordion.Header>
                 <Accordion.Body>
-                  <AddUserRecipe userId={users[0]?.id} />
+                  <AddUserRecipe userId={users[0]?.user_id} />
                 </Accordion.Body>
               </Accordion.Item>
             </Accordion>
+          </Col>
+        </Row>
+
+        <div className='mt-6'></div>
+
+        <Row className='w-100 justify-content-center'>
+          <Col md={7} className='bg-white p-6 rounded-lg shadow-lg'>
+            <UserRecipesList userId={userId} />
           </Col>
         </Row>
       </Container>

@@ -54,6 +54,8 @@ export const AddUserRecipe = ({ userId }) => {
      console.log(JSON.stringify(userCreatedRecipeData, null, 2));
     */
 
+    console.log(Id);
+
     axios
       .post('http://localhost:8081/createRecipe', { recipeTitle, recipeDescription, ingredientsArray, Id })
       .then(res => {

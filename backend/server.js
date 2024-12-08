@@ -28,7 +28,7 @@ app.get('/users', (req, res) => {
 });
 
 app.get('/users/:id', (req, res) => {
-  const sql = 'SELECT * FROM users WHERE id = ?';
+  const sql = 'SELECT * FROM users WHERE user_id = ?';
 
   const id = req.params.id;
 
@@ -40,6 +40,50 @@ app.get('/users/:id', (req, res) => {
     }
   });
 });
+
+app.get('/userRecipes/:id', (req, res) => {
+  const sqlSelectRecipes =
+    'SELECT recipe_id, title, description, ingredients, add_date, concat(users.user_name, " ", users.user_surname) as author, users.user_id FROM `recipe` JOIN user_recipe USING(recipe_id) JOIN users USING(user_id) WHERE user_id = ?';
+
+  const id = req.params.id;
+
+  db.query(sqlSelectRecipes, [id], (error, result) => {
+    if (error) {
+      return res.json('Error: ' + error);
+    } else {
+      return res.json(result);
+    }
+  });
+});
+
+app.get('/recipes/:id', (req, res) => {
+  const sqlSelectRecipes =
+    'SELECT recipe_id, title, description, ingredients, add_date, concat(users.user_name, " ", users.user_surname) as author, users.user_id FROM `recipe` JOIN user_recipe USING(recipe_id) JOIN users USING(user_id) WHERE recipe_id = ?';
+
+  const id = req.params.id;
+
+  db.query(sqlSelectRecipes, [id], (error, result) => {
+    if (error) {
+      return res.json('Error: ' + error);
+    } else {
+      return res.json(result);
+    }
+  });
+});
+
+app.get('/recipes', (req, res) => {
+  const sqlSelectAll = 'SELECT * from recipe';
+
+  db.query(sqlSelectAll, (error, result) => {
+    if (error) {
+      return res.json('Error: ' + error);
+    } else {
+      return res.json(result);
+    }
+  });
+});
+
+app.get('/searchRecipes/:query', (req, res) => {});
 
 //post
 app.post('/loginUser', (req, res) => {
@@ -85,8 +129,9 @@ app.post('/createUser', (req, res) => {
 });
 
 app.post('/createRecipe', (req, res) => {
-  const sqlCheck = 'Select * from recipe where title = ? and description = ? and ingredients = ?';
-  const sqlInsert = 'INSERT INTO recipe (title, description, ingredients, user_id) VALUES (?,?,?,?)';
+  const sqlCheck = 'SELECT * FROM recipe WHERE title = ? AND description = ? AND ingredients = ?';
+  const sqlInsertRecipe = 'INSERT INTO recipe (title, description, ingredients, add_date) VALUES (?, ?, ?, ?)';
+  const sqlInsertUserRecipe = 'INSERT INTO user_recipe (user_id, recipe_id) VALUES (?, ?)';
 
   const { recipeTitle, recipeDescription, ingredientsArray, Id } = req.body;
 
@@ -95,13 +140,33 @@ app.post('/createRecipe', (req, res) => {
   db.query(sqlCheck, [recipeTitle, recipeDescription, ingredientsJSON], (err, results) => {
     if (err) {
       return res.json({ error: 'Error: ' + err });
+    }
+
+    if (results.length > 0) {
+      return res.json({ message: 'Recipe already exists' });
     } else {
-      db.query(sqlInsert, [recipeTitle, recipeDescription, ingredientsJSON, Id], (err, results) => {
+      const date = new Date();
+
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+
+      let currentDate = `${year}-${month}-${day}`;
+
+      db.query(sqlInsertRecipe, [recipeTitle, recipeDescription, ingredientsJSON, date], (err, result) => {
         if (err) {
           return res.json({ error: 'Error: ' + err });
-        } else {
-          return res.json({ message: 'Recipe created successfully', recipeId: results.insertId });
         }
+
+        const recipeId = result.insertId;
+
+        db.query(sqlInsertUserRecipe, [Id, recipeId], (err, results) => {
+          if (err) {
+            return res.json({ error: 'Error: ' + err });
+          }
+
+          return res.json({ message: 'Recipe created successfully', recipeId: recipeId });
+        });
       });
     }
   });

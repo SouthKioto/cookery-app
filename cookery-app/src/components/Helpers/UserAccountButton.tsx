@@ -1,13 +1,16 @@
 import { Dropdown } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { GetUserIdFromToken } from './Utils';
 
 interface UserAccountButtonProps {
+  name: string;
+  value: string[];
   onLogOut: () => void;
 }
 
-export const UserAccountButton: React.FC<UserAccountButtonProps> = ({ onLogOut }) => {
+export const UserAccountButton: React.FC<UserAccountButtonProps> = ({ name, value, onLogOut }) => {
   const navigate = useNavigate();
-
+  const userId = GetUserIdFromToken();
   const handleLogOut = () => {
     localStorage.removeItem('userToken');
     onLogOut();
@@ -17,14 +20,14 @@ export const UserAccountButton: React.FC<UserAccountButtonProps> = ({ onLogOut }
   return (
     <Dropdown>
       <Dropdown.Toggle variant='outline-success' id='dropdown-basic'>
-        Dropdown Button
+        {name}
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
-        <Dropdown.Item href='#/action-1'>Action</Dropdown.Item>
-        <Dropdown.Item href='#/action-2'>Another action</Dropdown.Item>
-        <Dropdown.Item href='#/action-3'>Something else</Dropdown.Item>
-        <Dropdown.Item onClick={handleLogOut}>Log Out</Dropdown.Item>
+        <Dropdown.Item as={Link} to={`/users/userPage/${userId}`}>
+          {value[0]}
+        </Dropdown.Item>
+        <Dropdown.Item onClick={handleLogOut}>{value[1]}</Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

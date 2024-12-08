@@ -18,7 +18,7 @@ export const LoginPage = () => {
     axios
       .post('http://localhost:8081/loginUser', { email, password })
       .then(res => {
-        const token = GenerateUserTokent(res.data[0].id);
+        const token = GenerateUserTokent(res.data[0].user_id);
         //console.log(token);//console.log(res.data[0].id);
         //console.log(res.data);
         const storageData = [
