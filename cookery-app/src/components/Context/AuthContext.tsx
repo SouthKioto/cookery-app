@@ -13,6 +13,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(localStorage.getItem('userToken'));
   const isAuthenticated = !!token;
 
+  // Nasłuchujemy na zmiany w localStorage, aby zaktualizować token
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedToken = localStorage.getItem('userToken');
+      setToken(storedToken);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    const storedToken = localStorage.getItem('userToken');
+    setToken(storedToken);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   const login = (newToken: string) => {
     localStorage.setItem('userToken', newToken);
     setToken(newToken);
@@ -22,17 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('userToken');
     setToken(null);
   };
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setToken(localStorage.getItem('userToken'));
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
 
   return <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>{children}</AuthContext.Provider>;
 };

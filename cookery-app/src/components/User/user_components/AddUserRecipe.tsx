@@ -68,7 +68,7 @@ export const AddUserRecipe = ({ userId }) => {
     <>
       <Container fluid>
         <Row className='justify-center'>
-          <Col md={6} className='bg-white p-6 rounded-lg shadow-lg'>
+          <Col md={10} className='bg-white p-6 rounded-lg shadow-lg'>
             {/* Recipe Title */}
             <p className='text-center text-md font-medium text-gray-600 mb-4'>Nazwa</p>
             <input

@@ -6,6 +6,7 @@ import { GenerateDish } from './user_components/GenerateDish';
 import { AddUserRecipe } from './user_components/AddUserRecipe';
 import { UserRecipesList } from './user_components/UserRecipesList';
 import { GetUserIdFromToken } from '../Helpers/Utils';
+import { LikedRecipes } from './user_components/LikedRecipes';
 
 export const UserPage = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -102,7 +103,7 @@ export const UserPage = () => {
         <div className='mt-6'></div>
 
         <Row className='w-100 justify-content-center'>
-          <Col md={8}>
+          <Col md={7}>
             <Accordion defaultActiveKey='0' className='shadow-lg'>
               <Accordion.Item eventKey='0'>
                 <Accordion.Header className='text-lg font-semibold'>Generuj przepis na danie</Accordion.Header>
@@ -125,6 +126,14 @@ export const UserPage = () => {
         <Row className='w-100 justify-content-center'>
           <Col md={7} className='bg-white p-6 rounded-lg shadow-lg'>
             <UserRecipesList userId={userId} />
+          </Col>
+        </Row>
+
+        <div className='mt-6'></div>
+
+        <Row className='w-100 justify-content-center'>
+          <Col md={7} className='bg-white p-6 rounded-lg shadow-lg'>
+            <LikedRecipes />
           </Col>
         </Row>
       </Container>

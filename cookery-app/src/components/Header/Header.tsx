@@ -7,10 +7,12 @@ import { useAuth } from '../Context/AuthContext';
 export const Header = () => {
   const { isAuthenticated, logout } = useAuth();
 
+  console.log('isAuthenticated:', isAuthenticated);
+
   return (
     <Navbar bg='dark' data-bs-theme='dark'>
       <Container>
-        <Navbar.Brand>Cookery App</Navbar.Brand>
+        <Navbar.Brand>Cookery</Navbar.Brand>
         <Nav className='me-auto'>
           <Nav.Link as={Link} to={'/home'}>
             Home

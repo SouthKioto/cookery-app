@@ -71,8 +71,8 @@ app.get('/recipes/:id', (req, res) => {
   });
 });
 
-app.get('/recipes', (req, res) => {
-  const sqlSelectAll = 'SELECT * from recipe';
+app.get('/nevest-recipes', (req, res) => {
+  const sqlSelectAll = 'SELECT * from recipe ORDER BY add_date DESC LIMIT 6';
 
   db.query(sqlSelectAll, (error, result) => {
     if (error) {
@@ -170,6 +170,10 @@ app.post('/createRecipe', (req, res) => {
       });
     }
   });
+});
+
+app.post('/add-to-liked-recipes', (req, res) => {
+  const sqlCheckLiked = 'INSERT INTO liked_recipes  ';
 });
 
 app.listen(8081, () => {

@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import { Recipe } from '../Helpers/Interfaces';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 export const Home = () => {
   const [recipesData, setRecipesData] = useState<Recipe[]>();
-  const [shorterDesription, setShorterDesription] = useState<string>();
+  //const [shorterDesription, setShorterDesription] = useState<string>();
 
   useEffect(() => {
     axios
-      .get<Recipe[]>('http://localhost:8081/recipes')
+      .get<Recipe[]>('http://localhost:8081/nevest-recipes')
       .then(res => {
         console.log(res.data);
         setRecipesData(res.data);
@@ -40,7 +41,7 @@ export const Home = () => {
     <div className='bg-gradient-to-r from-green-400 to-blue-500 min-h-screen text-white'>
       <Container className='py-5'>
         <header className='text-center mb-5'>
-          <h1 className='text-4xl font-bold'>Witamy w aplikacji kulinarnej!</h1>
+          <h1 className='text-4xl font-bold'>Witamy w Cookery!</h1>
           <p className='text-xl mt-3'>
             Odkrywaj, gotuj i dziel się swoimi ulubionymi przepisami z naszą tętniącą życiem społecznością.
           </p>
@@ -48,7 +49,7 @@ export const Home = () => {
 
         {/* Section for Featured Recipes */}
         <section>
-          <h2 className='text-2xl font-semibold text-center mb-4'>Najwyżej oceniane przepisy</h2>
+          <h2 className='text-2xl font-semibold text-center mb-4'>Najnowsze przepisy</h2>
           <Row className='g-4'>
             {recipesData ? (
               recipesData.map((data, index) => (
@@ -57,7 +58,11 @@ export const Home = () => {
                     <Card.Body>
                       <Card.Title className='font-semibold text-lg'>{data.title}</Card.Title>
                       <Card.Text>{handleChangeDescription(data.description)}</Card.Text>
-                      <Button variant='primary' className='w-full bg-green-500 hover:bg-green-600'>
+                      <Button
+                        as={Link}
+                        to={`/recipePage/${data.recipe_id}`}
+                        variant='primary'
+                        className='w-full bg-green-500 hover:bg-green-600'>
                         View Recipe
                       </Button>
                     </Card.Body>

@@ -10,9 +10,6 @@ export const UserRecipesList: React.FC<{ userId: number | undefined }> = ({ user
 
   useEffect(() => {
     if (!userId) return;
-
-    //console.log(userId);
-
     axios
       .get<Recipe[]>(`http://localhost:8081/userRecipes/${userId}`)
       .then(res => {
@@ -29,6 +26,7 @@ export const UserRecipesList: React.FC<{ userId: number | undefined }> = ({ user
       <Container>
         <Row>
           <Col>
+            <p className='text-xl font-bold p-2 text-center'>Twoje Przepisy</p>
             {userRecipes
               ? userRecipes.map((recipe, index) => (
                   <Link to={`/recipePage/${recipe.recipe_id}`} style={{ textDecoration: 'none' }}>

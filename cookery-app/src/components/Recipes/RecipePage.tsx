@@ -39,6 +39,10 @@ export const RecipePage = () => {
       });
   }, [recipeId]);
 
+  useEffect(() => {
+    
+  }, [])
+
   const [isFavorite, setIsFavorite] = useState(false);
 
   const toggleFavorite = () => {

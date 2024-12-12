@@ -1,30 +1,28 @@
-import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Alert } from 'react-bootstrap';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AiFillFacebook, AiFillGoogleCircle, AiFillTwitterCircle } from 'react-icons/ai';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { GenerateUserTokent } from '../Helpers/Utils';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+
+  const [alert, setAlert] = useState<{ variant: string; message: string }>({ variant: '', message: '' });
+
   const navigate = useNavigate();
 
-  const handleSubmitLogin = e => {
+  const handleSubmitLogin = (e: any) => {
     e.preventDefault();
-
-    //console.log(email, password);
 
     axios
       .post('http://localhost:8081/loginUser', { email, password })
       .then(res => {
         const token = GenerateUserTokent(res.data[0].user_id);
-        //console.log(token);//console.log(res.data[0].id);
-        //console.log(res.data);
         const storageData = [
           {
             token: token,
-            //role: 'user',
             isLoggedIn: true,
           },
         ];
@@ -32,13 +30,27 @@ export const LoginPage = () => {
         localStorage.setItem('userToken', JSON.stringify(storageData));
         navigate(`/users/userPage/${token}`);
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        if (error.response) {
+          setAlert({ variant: 'danger', message: error.response.data.error || 'Błąd logowania' });
+        } else {
+          setAlert({ variant: 'danger', message: 'Wystąpił błąd. Spróbuj ponownie.' });
+        }
+      });
   };
 
   return (
     <>
       <div className='flex items-center justify-center h-screen bg-gray-200'>
         <Container>
+          {alert.message && (
+            <Row className='justify-content-center'>
+              <Col md={6}>
+                <Alert variant={alert.variant}>{alert.message}</Alert>
+              </Col>
+            </Row>
+          )}
+
           <Row className='justify-content-center'>
             <Col md={6}>
               <Card className='bg-opacity-75 bg-transparent shadow-lg border-0'>
