@@ -133,7 +133,7 @@ export const UserPage = () => {
 
         <Row className='w-100 justify-content-center'>
           <Col md={7} className='bg-white p-6 rounded-lg shadow-lg'>
-            <LikedRecipes />
+            <LikedRecipes userId={userId} />
           </Col>
         </Row>
       </Container>

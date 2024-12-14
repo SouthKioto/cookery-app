@@ -11,6 +11,7 @@ export interface Recipe {
   title: string;
   description: string;
   ingredients: string;
+  cooking_time: string;
   author: string;
   user_id: number;
 }

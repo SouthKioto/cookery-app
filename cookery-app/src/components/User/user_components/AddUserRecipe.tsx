@@ -7,13 +7,14 @@ export const AddUserRecipe = ({ userId }) => {
   const [ingredientsArray, setIngredientsArray] = useState<string[]>([]);
   const [recipeTitle, setRecipeTitle] = useState<string>('');
   const [recipeDescription, setRecipeDescription] = useState<string>('');
+  const [recipeCookingTime, setRecipeCookingTime] = useState<string>('');
   const [changeAddButtonVisibility, setChangeAddButtonVisibility] = useState<boolean>(false);
 
   const Id = userId;
 
   useEffect(() => {
     checkIngredientsArray();
-  }, [ingredientsArray, recipeTitle, recipeDescription]);
+  }, [ingredientsArray, recipeTitle, recipeDescription, recipeCookingTime]);
 
   const checkIngredientsArray = () => {
     if (
@@ -57,7 +58,13 @@ export const AddUserRecipe = ({ userId }) => {
     console.log(Id);
 
     axios
-      .post('http://localhost:8081/createRecipe', { recipeTitle, recipeDescription, ingredientsArray, Id })
+      .post('http://localhost:8081/createRecipe', {
+        recipeTitle,
+        recipeDescription,
+        ingredientsArray,
+        recipeCookingTime,
+        Id,
+      })
       .then(res => {
         console.log(res);
       })
@@ -88,6 +95,7 @@ export const AddUserRecipe = ({ userId }) => {
               onChange={e => setIngredients(e.target.value)}
               placeholder='Np. pomidory, cebula, czosnek'
               required></textarea>
+
             <Button
               className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300 mt-4'
               onClick={handleSubmitIngredients}>
@@ -101,6 +109,16 @@ export const AddUserRecipe = ({ userId }) => {
               placeholder='Tutaj podaj kroki wykonania przepisu'
               required
               onChange={e => setRecipeDescription(e.target.value)}></textarea>
+
+            {/* Recipe cooking time */}
+            <p className='text-center text-md font-medium text-gray-600 my-6'>Czas wykonania</p>
+            <input
+              type='text'
+              placeholder='Podaj czas wykonania przepisu'
+              className='w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400'
+              required
+              onChange={e => setRecipeCookingTime(e.target.value)}
+            />
 
             {/* Ingredients List */}
             {ingredientsArray.length > 0 && (

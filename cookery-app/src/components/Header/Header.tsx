@@ -3,12 +3,10 @@ import { Link } from 'react-router-dom';
 import { NavigationButton } from '../Helpers/NavigationButton';
 import { UserAccountButton } from '../Helpers/UserAccountButton';
 import { useAuth } from '../Context/AuthContext';
+import { useEffect, useState } from 'react';
 
 export const Header = () => {
   const { isAuthenticated, logout } = useAuth();
-
-  console.log('isAuthenticated:', isAuthenticated);
-
   return (
     <Navbar bg='dark' data-bs-theme='dark'>
       <Container>

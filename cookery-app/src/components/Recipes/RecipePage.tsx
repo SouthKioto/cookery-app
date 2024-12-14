@@ -6,6 +6,7 @@ import { Container, Card, ListGroup } from 'react-bootstrap';
 
 import { useAuth } from '../Context/AuthContext';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
+import { GetUserIdFromToken } from '../Helpers/Utils';
 
 export const RecipePage = () => {
   const { recipeId } = useParams();
@@ -13,13 +14,17 @@ export const RecipePage = () => {
   const [authorId, setAuthorId] = useState<number>();
   const [token, setToken] = useState<string>();
   const { isAuthenticated } = useAuth();
+  const user = GetUserIdFromToken();
+
+  const [isFavorite, setIsFavorite] = useState<boolean>();
 
   useEffect(() => {
-    axios
-      .get<Recipe[]>(`http://localhost:8081/recipes/${recipeId}`)
-      .then(res => {
-        setRecipeData(res.data);
-        //handleCheckToken();
+    const fetchRecipeData = async () => {
+      try {
+        const recipeResponse = await axios.get<Recipe[]>(`http://localhost:8081/recipes/${recipeId}`);
+        const fetchedRecipeData = recipeResponse.data;
+        setRecipeData(fetchedRecipeData);
+
         if (isAuthenticated) {
           const storedToken = localStorage.getItem('userToken');
           if (storedToken) {
@@ -30,23 +35,55 @@ export const RecipePage = () => {
               console.error(e);
             }
           }
-        } else {
-          setAuthorId(recipeData[0]?.user_id);
         }
-      })
-      .catch(error => {
+
+        //console.log(user);
+
+        console.log(fetchedRecipeData);
+        console.log(recipeId);
+
+        const likedResponse = await axios.post('http://localhost:8081/is-liked-recipe', { recipeId, userId: user });
+        setIsFavorite(likedResponse.data.liked);
+      } catch (error) {
         console.error(error);
-      });
-  }, [recipeId]);
+      }
+    };
 
-  useEffect(() => {
-    
-  }, [])
-
-  const [isFavorite, setIsFavorite] = useState(false);
+    fetchRecipeData();
+  }, [recipeId, isAuthenticated]);
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
+
+    if (isFavorite) {
+      handleRemoveRecipeFromFavorites();
+    } else {
+      handleAddRecipeToFavorites();
+      console.log(recipeId);
+      console.log(user);
+    }
+  };
+
+  const handleAddRecipeToFavorites = () => {
+    axios
+      .post('http://localhost:8081/add-to-liked-recipes', { recipeId, userId: user })
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  };
+
+  const handleRemoveRecipeFromFavorites = () => {
+    axios
+      .post('http://localhost:8081/remove-from-liked-recipes', { recipeId, userId: user })
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(err => {
+        console.error(err);
+      });
   };
 
   const handleParseIngredients = (ingredients: string) => {
@@ -65,16 +102,26 @@ export const RecipePage = () => {
             <Card.Title className='text-3xl font-extrabold text-gray-800'>
               {recipeData[0]?.title || 'Recipe Title'}
             </Card.Title>
-            <div onClick={toggleFavorite} className='cursor-pointer text-yellow-500'>
-              {isFavorite ? <AiFillStar size={30} /> : <AiOutlineStar size={30} />}
-            </div>
+            {isAuthenticated ? (
+              <div onClick={toggleFavorite} className='cursor-pointer text-yellow-500'>
+                {isFavorite ? <AiFillStar size={30} /> : <AiOutlineStar size={30} />}
+              </div>
+            ) : (
+              ''
+            )}
           </div>
 
           <Card.Text className='text-gray-600 text-lg leading-relaxed mb-6'>
+            <p className='text-2xl font-semibold text-gray-700 mb-3'>Czas przygotowania:</p>
+            {recipeData[0]?.cooking_time || 'No description available.'}
+          </Card.Text>
+
+          <Card.Text className='text-gray-600 text-lg leading-relaxed mb-6'>
+            <p className='text-2xl font-semibold text-gray-700 mb-3'>Kroki przygotowania</p>
             {recipeData[0]?.description || 'No description available.'}
           </Card.Text>
 
-          <h2 className='text-2xl font-semibold text-gray-700 mb-3'>Ingredients</h2>
+          <p className='text-2xl font-semibold text-gray-700 mb-3'>Ingredients</p>
           <ListGroup className='mb-6'>
             {handleParseIngredients(recipeData[0]?.ingredients).map((ingredient: string, index: number) => (
               <ListGroup.Item key={index} className='bg-white border-gray-200 rounded-lg shadow-sm p-2 mb-2'>
