@@ -95,7 +95,11 @@ app.get('/nevest-recipes', (req, res) => {
   });
 });*/
 
-app.get('/searchRecipes/:query', (req, res) => {});
+app.get('/searchRecipes/:query', (req, res) => {
+  const query = req.params.query;
+
+  db.query(query, (err, result) => {});
+});
 
 app.get('/get-liked-recipes/:userId', (req, res) => {
   const sql = 'SELECT * FROM `recipe` JOIN user_liked_recipes USING(recipe_id) WHERE user_id = ?';

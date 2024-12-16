@@ -11,6 +11,7 @@ import { Header } from './components/Header/Header.tsx';
 import { UserPage } from './components/User/UserPage.tsx';
 import { RecipePage } from './components/Recipes/RecipePage.tsx';
 import { AuthProvider } from './components/Context/AuthContext.tsx';
+import { Search } from './components/Search/Search.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -20,10 +21,14 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path='/' element={<Navigate to='/home' />} />
           <Route path='/home' element={<Home />} />
+
+          <Route path='/search' element={<Search />} />
+
           <Route path='/form'>
             <Route path='login' element={<LoginPage />} />
             <Route path='register' element={<RegisterPage />} />
           </Route>
+
           <Route path='/users'>
             <Route path='userpage/:id' element={<UserPage />} />
           </Route>

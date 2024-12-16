@@ -23,6 +23,7 @@ export const RecipePage = () => {
       try {
         const recipeResponse = await axios.get<Recipe[]>(`http://localhost:8081/recipes/${recipeId}`);
         const fetchedRecipeData = recipeResponse.data;
+        setAuthorId(fetchedRecipeData[0]?.user_id);
         setRecipeData(fetchedRecipeData);
 
         if (isAuthenticated) {

@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import { Recipe } from '../../Helpers/Interfaces';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../Context/AuthContext';
 
 export const UserRecipesList: React.FC<{ userId: number | undefined }> = ({ userId }) => {
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
   const [token, setToken] = useState();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (!userId) return;
@@ -26,7 +28,9 @@ export const UserRecipesList: React.FC<{ userId: number | undefined }> = ({ user
       <Container>
         <Row>
           <Col>
-            <p className='text-xl font-bold p-2 text-center'>Twoje Przepisy</p>
+            <p className='text-xl font-bold p-2 text-center'>
+              {isAuthenticated ? 'Twoje Przepisy' : 'Utworzone przepisy'}
+            </p>
             {userRecipes
               ? userRecipes.map((recipe, index) => (
                   <Link to={`/recipePage/${recipe.recipe_id}`} style={{ textDecoration: 'none' }}>
